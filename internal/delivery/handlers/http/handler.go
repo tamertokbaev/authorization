@@ -1,6 +1,8 @@
 package http
 
 import (
+	"diploma/authorization/internal/config"
+	v1 "diploma/authorization/internal/delivery/handlers/http/v1"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -22,7 +24,7 @@ func NewHandlerDelivery(
 	}
 }
 
-func (h *Handler) Init() (*gin.Engine, error) {
+func (h *Handler) Init(cfg *config.Config) (*gin.Engine, error) {
 	app := gin.New()
 	app.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, map[string]string{"message": "pong"})
@@ -49,9 +51,13 @@ func (h *Handler) Init() (*gin.Engine, error) {
 }
 
 func (h *Handler) initAPI(router *gin.Engine) {
-	//baseUrl := router.Group(h.baseUrl)
+	baseUrl := router.Group(h.baseUrl)
 
 	router.GET(h.baseUrl+"-docs/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
-	//api := baseUrl.Group("/api")
+	handlerV1 := v1.NewHandler()
+	api := baseUrl.Group("/api")
+	{
+		handlerV1.Init(api)
+	}
 }
