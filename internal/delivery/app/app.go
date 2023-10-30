@@ -7,6 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func Run(cfg *config.Config) {
@@ -33,4 +36,11 @@ func Run(cfg *config.Config) {
 			fmt.Printf("✅ Server shutdown successfully")
 		}
 	}()
+
+	fmt.Sprintf("🚀 Starting server at http://0.0.0.0:%s", cfg.Service.Port)
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+
+	<-quit
 }
